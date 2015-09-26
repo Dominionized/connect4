@@ -15,6 +15,15 @@ public class Board {
         cellArray = new Cell[sizeX][sizeY];
         this.sizeX = sizeX;
         this.sizeY = sizeY;
+        initializeCells();
+    }
+
+    private void initializeCells() {
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+                cellArray[i][j] = new Cell(Cell.CellType.EMPTY);
+            }
+        }
     }
 
     public Board() {
@@ -23,8 +32,21 @@ public class Board {
 
     public Cell[][] cellArray;
 
-    public boolean connected(int startingPointX, int startingPointY, int numberOfConnectedCells) {
+    public void dropToken(int posX, Cell.CellType cellType) throws Exception {
+        if (cellArray[posX][0].cellType != Cell.CellType.EMPTY) {
+            throw new Exception("Stack full");
+        }
 
+        for (int i = 0; i < sizeY; i++) {
+            if (!inBounds(posX, i + 1) || (cellArray[posX][i + 1].cellType != Cell.CellType.EMPTY)) {
+                cellArray[posX][i].cellType = cellType;
+                return;
+            }
+        }
+    }
+
+    public boolean connected(int startingPointX, int startingPointY, int numberOfConnectedCells) {
+        return false;
     }
 
     public int numberOfConnectedCells(int x, int y, Direction dir, Cell.CellType type) {
@@ -60,5 +82,25 @@ public class Board {
 
     private boolean inBounds(int x, int y) {
         return (x >= 0 && y >= 0 && x < sizeX && y < sizeY);
+    }
+
+    public void debugCellArray() {
+        for (int j = 0; j < sizeY; j++) {
+            for (int i = 0; i < sizeX; i++) {
+                switch(cellArray[i][j].cellType) {
+                    case BLACK:
+                        System.out.print("B");
+                        break;
+                    case RED:
+                        System.out.print("R");
+                        break;
+                    case EMPTY:
+                        System.out.print(".");
+                        break;
+                }
+            }
+            System.out.print("\n");
+        }
+        System.out.println();
     }
 }

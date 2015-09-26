@@ -5,6 +5,20 @@ package ca.csf.connect4;
  */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello word");
+        Board board = new Board();
+
+        board.debugCellArray();
+
+        try {
+            board.dropToken(0, Cell.CellType.RED);
+            board.dropToken(0, Cell.CellType.BLACK);
+            board.dropToken(0, Cell.CellType.BLACK);
+            board.dropToken(0, Cell.CellType.RED);
+            board.dropToken(1, Cell.CellType.RED);
+            board.debugCellArray();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
