@@ -15,10 +15,17 @@ public class Main {
             board.dropToken(0, Cell.CellType.BLACK);
             board.dropToken(0, Cell.CellType.RED);
             board.dropToken(1, Cell.CellType.RED);
+            board.dropToken(1, Cell.CellType.BLACK);
+            board.dropToken(1, Cell.CellType.RED);
+            board.dropToken(2, Cell.CellType.RED);
+            board.dropToken(2, Cell.CellType.RED);
+            board.dropToken(3, Cell.CellType.RED);
             board.debugCellArray();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
+        System.out.println(board.checkAround(0, 2, 4));
     }
 }

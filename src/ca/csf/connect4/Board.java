@@ -47,7 +47,7 @@ public class Board {
 
     public boolean checkAround(int x, int y, int numberOfConnectedCells) {
         for (Direction dir : Direction.values()) {
-            if (numberOfConnectedCells(x, y, dir) >= numberOfConnectedCells) return true;
+            if ((numberOfConnectedCells(x, y, dir) + numberOfConnectedCells(x, y, dir.reverse())) - 1 >= numberOfConnectedCells) return true;
         }
         return false;
     }
@@ -80,6 +80,20 @@ public class Board {
        Direction(int relativePosX, int relativePosY) {
             this.relativePosX = relativePosX;
             this.relativePosY = relativePosY;
+        }
+
+        public Direction reverse() {
+            switch (this) {
+                case TOP_LEFT:      return BOTTOM_RIGHT;
+                case TOP :          return BOTTOM;
+                case TOP_RIGHT:     return BOTTOM_LEFT;
+                case LEFT:          return RIGHT;
+                case RIGHT:         return LEFT;
+                case BOTTOM_LEFT:   return TOP_RIGHT;
+                case BOTTOM:        return TOP;
+                default:            return TOP_LEFT;
+            }
+
         }
     }
 
