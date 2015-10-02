@@ -10,5 +10,10 @@ public class Game {
     }
     private Board board;
 
+    public void play() {
+        while (true) {
+
+        }
+    }
 
 }
