@@ -45,16 +45,19 @@ public class Board {
         }
     }
 
-    public boolean connected(int startingPointX, int startingPointY, int numberOfConnectedCells) {
+    public boolean checkAround(int x, int y, int numberOfConnectedCells) {
+        for (Direction dir : Direction.values()) {
+            if (numberOfConnectedCells(x, y, dir) >= numberOfConnectedCells) return true;
+        }
         return false;
     }
 
-    public int numberOfConnectedCells(int x, int y, Direction dir, Cell.CellType type) {
+    private int numberOfConnectedCells(int x, int y, Direction dir) {
         int nextX = x + dir.relativePosX;
         int nextY = y + dir.relativePosY;
-        if (inBounds(nextX, nextY)
-                && cellArray[nextX][nextY].cellType == type) {
-            return numberOfConnectedCells(nextX, nextY, dir, type);
+
+        if (inBounds(nextX, nextY) && (cellArray[nextX][nextY].cellType == cellArray[x][y].cellType)) {
+            return 1 + numberOfConnectedCells(nextX, nextY, dir);
         }
         else {
             return 1;
