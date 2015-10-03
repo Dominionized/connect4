@@ -27,5 +27,8 @@ public class Main {
         }
 
         System.out.println(board.checkAround(0, 2, 4));
+
+
+        Connect4Controller ctrl = new Connect4Controller();
     }
 }

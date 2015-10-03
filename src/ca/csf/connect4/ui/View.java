@@ -1,5 +1,7 @@
 package ca.csf.connect4.ui;
 
+import ca.csf.connect4.Connect4Controller;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -8,14 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 public class View extends JFrame
 {
@@ -30,8 +25,12 @@ public class View extends JFrame
 	private final JTextField message = new JTextField(20);
 	private final JPanel centerPane = new JPanel();
 
-	private View()
+	private Connect4Controller controller;
+
+	public View(Connect4Controller controller)
 	{
+        this.controller = controller;
+
 		this.setTitle("Connect4");
 
 		this.configureWindow();
@@ -65,7 +64,7 @@ public class View extends JFrame
 		this.setJMenuBar(menuBar);
 	}
 
-	private void initBoard(int nbRows, int nbColumns)
+	public void initBoard(int nbRows, int nbColumns)
 	{
 		this.centerPane.removeAll();
 		this.placeHolders = new MyImageContainer[nbRows][nbColumns];
@@ -81,7 +80,8 @@ public class View extends JFrame
 			centerPane.add(button);
 		}
 
-		for (int row = nbRows - 1; row >= 0; row--)
+		//for (int row = nbRows - 1; row >= 0; row--)
+        for (int row = 0; row < nbRows; row++)
 		{
 			for (int column = 0; column < nbColumns; column++)
 			{
@@ -118,6 +118,7 @@ public class View extends JFrame
 		public void actionPerformed(ActionEvent arg0)
 		{
 			System.out.println("Action on button: " + columnIndex);
+            controller.dropToken(columnIndex);
 		}
 	}
 
@@ -135,14 +136,19 @@ public class View extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent arg0)
 		{
-			JOptionPane.showMessageDialog(View.this, "GUI for Connect4\n420-520-SF TP1\n\nAuthor: Fran�ois Gagnon", "About", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(View.this, "GUI for Connect4\n420-520-SF TP1\n\nAuthor: François Gagnon", "About", JOptionPane.INFORMATION_MESSAGE);
 		}
+	}
+
+	public void setIcon(int x, int y, ImageIcon icon) {
+		placeHolders[x][y].setIcon(icon);
+
 	}
 
 	public static void main(String[] args)
 	{
 		// test
-		View view = new View();
+		View view = new View(null);
 		view.initBoard(6, 7);
 	}
 

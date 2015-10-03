@@ -5,11 +5,15 @@ package ca.csf.connect4;
  */
 public class Board {
 
-    private final static int DEFAULT_SIZE_X = 7;
-    private final static int DEFAULT_SIZE_Y = 6;
+    private final static int DEFAULT_SIZE_X = 6;
+    private final static int DEFAULT_SIZE_Y = 7;
 
     private int sizeX;
     private int sizeY;
+
+    private Cell lastChangedCell;
+    private int lastChangedCellX;
+    private int lastChangedCellY;
 
     public Board(int sizeX, int sizeY) {
         cellArray = new Cell[sizeX][sizeY];
@@ -30,7 +34,11 @@ public class Board {
         this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
     }
 
-    public Cell[][] cellArray;
+    private Cell[][] cellArray;
+
+    public Cell[][] getCellArray() {
+        return cellArray;
+    }
 
     public void dropToken(int posX, Cell.CellType cellType) throws Exception {
         if (cellArray[posX][0].cellType != Cell.CellType.EMPTY) {
@@ -40,6 +48,9 @@ public class Board {
         for (int i = 0; i < sizeY; i++) {
             if (!inBounds(posX, i + 1) || (cellArray[posX][i + 1].cellType != Cell.CellType.EMPTY)) {
                 cellArray[posX][i].cellType = cellType;
+                lastChangedCell = cellArray[posX][i];
+                lastChangedCellX = posX;
+                lastChangedCellY = i;
                 return;
             }
         }
@@ -50,6 +61,15 @@ public class Board {
             if ((numberOfConnectedCells(x, y, dir) + numberOfConnectedCells(x, y, dir.reverse())) - 1 >= numberOfConnectedCells) return true;
         }
         return false;
+    }
+
+    public boolean isFull() {
+        for (Cell[] row : cellArray) {
+            for (Cell cell : row) {
+                if (cell.cellType == Cell.CellType.EMPTY) return false;
+            }
+        }
+        return true;
     }
 
     private int numberOfConnectedCells(int x, int y, Direction dir) {
@@ -119,5 +139,25 @@ public class Board {
             System.out.print("\n");
         }
         System.out.println();
+    }
+
+    public Cell getLastChangedCell() {
+        return lastChangedCell;
+    }
+
+    public int getLastChangedCellX() {
+        return lastChangedCellX;
+    }
+
+    public int getLastChangedCellY() {
+        return lastChangedCellY;
+    }
+
+    public int getSizeX() {
+        return sizeX;
+    }
+
+    public int getSizeY() {
+        return sizeY;
     }
 }
