@@ -7,19 +7,37 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import ca.csf.connect4.Cell.CellType;
 
 /**
  * Created by dom on 25/09/15.
  */
 public class Connect4Controller {
+    private static final String iconsPath = "resources/";
+    private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
+
     private View view;
     private Game game;
+    private ImageIcon[] icons;
 
-    public Connect4Controller() {
+
+    public Connect4Controller() throws IOException {
         view = new View(this);
-        game = new Game(2);
+        game = new Game();
 
-        view.initBoard(game.getSizeX(),game.getSizeY());
+        view.initBoard(game.getSizeX(), game.getSizeY());
+        initIcons();
+    }
+
+    private void initIcons() throws IOException {
+        int numberPlayers = Game.DEFAULT_NB_PLAYERS;
+        icons = new ImageIcon[numberPlayers];
+        StringBuilder pathBuilder = new StringBuilder();
+        for (int i = 0; i < numberPlayers; ++i) {
+            String path = pathBuilder.append(iconsPath).append(iconsName[i]).toString();
+            icons[i] = new ImageIcon(ImageIO.read(new File(path)));
+            pathBuilder.delete(0, pathBuilder.length());
+        }
     }
 
     public void dropToken(int pos) {
@@ -32,16 +50,11 @@ public class Connect4Controller {
     }
 
     public void updateView() {
-        String imageName = game.getLastChangedCell().cellType.toString() + ".png";
-        try {
-            view.setIcon(
-                    game.getLastChangedCellX(),
-                    game.getLastChangedCellY(),
-                    new ImageIcon(ImageIO.read(new File("resources/" + imageName)))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        int lastCellPlayedIndex = game.getLastChangedCell().cellType.ordinal();
+        ImageIcon lastPlayedIcon = icons[lastCellPlayedIndex];
+        view.setIcon(game.getLastChangedCellX(),
+                     game.getLastChangedCellY(),
+                     lastPlayedIcon);
     }
 
 }

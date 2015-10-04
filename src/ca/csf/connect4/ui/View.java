@@ -141,7 +141,7 @@ public class View extends JFrame
 	}
 
 	public void setIcon(int x, int y, ImageIcon icon) {
-		placeHolders[x][y].setIcon(icon);
+		placeHolders[x][y].setImageIcon(icon);
 
 	}
 

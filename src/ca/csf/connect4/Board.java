@@ -1,4 +1,5 @@
 package ca.csf.connect4;
+import ca.csf.connect4.Cell.CellType;
 
 /**
  * Created by dom on 25/09/15.
@@ -11,9 +12,46 @@ public class Board {
     private int sizeX;
     private int sizeY;
 
+    private Cell[][] cellArray;
+
     private Cell lastChangedCell;
     private int lastChangedCellX;
     private int lastChangedCellY;
+
+    private enum Direction {
+        TOP_LEFT(-1, -1),
+        TOP(0,-1),
+        TOP_RIGHT(1,-1),
+        LEFT(-1, 0),
+        RIGHT(1,0),
+        BOTTOM_LEFT(-1, 1),
+        BOTTOM(0, 1),
+        BOTTOM_RIGHT(1, 1);
+
+        public int relativePosX;
+        public int relativePosY;
+        private Direction reverse;
+
+        static {
+            TOP_LEFT.reverse = BOTTOM_RIGHT;
+            TOP.reverse = BOTTOM;
+            TOP_RIGHT.reverse = BOTTOM_LEFT;
+            LEFT.reverse = RIGHT;
+            RIGHT.reverse = LEFT;
+            BOTTOM_LEFT.reverse = TOP_RIGHT;
+            BOTTOM.reverse = TOP;
+            BOTTOM_RIGHT.reverse = TOP.LEFT;
+        }
+
+        Direction(int relativePosX, int relativePosY) {
+            this.relativePosX = relativePosX;
+            this.relativePosY = relativePosY;
+        }
+
+        public Direction getReverse() {
+            return this.reverse;
+        }
+    }
 
     public Board(int sizeX, int sizeY) {
         cellArray = new Cell[sizeX][sizeY];
@@ -34,13 +72,11 @@ public class Board {
         this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
     }
 
-    private Cell[][] cellArray;
-
     public Cell[][] getCellArray() {
         return cellArray;
     }
 
-    public void dropToken(int posX, Cell.CellType cellType) throws Exception {
+    public void dropToken(int posX, CellType cellType) throws Exception {
         if (cellArray[posX][0].cellType != Cell.CellType.EMPTY) {
             throw new Exception("Stack full");
         }
@@ -58,7 +94,7 @@ public class Board {
 
     public boolean checkAround(int x, int y, int numberOfConnectedCells) {
         for (Direction dir : Direction.values()) {
-            if ((numberOfConnectedCells(x, y, dir) + numberOfConnectedCells(x, y, dir.reverse())) - 1 >= numberOfConnectedCells) return true;
+            if ((numberOfConnectedCells(x, y, dir) + numberOfConnectedCells(x, y, dir.getReverse())) - 1 >= numberOfConnectedCells) return true;
         }
         return false;
     }
@@ -66,7 +102,7 @@ public class Board {
     public boolean isFull() {
         for (Cell[] row : cellArray) {
             for (Cell cell : row) {
-                if (cell.cellType == Cell.CellType.EMPTY) return false;
+                if (cell.cellType == CellType.EMPTY) return false;
             }
         }
         return true;
@@ -81,39 +117,6 @@ public class Board {
         }
         else {
             return 1;
-        }
-    }
-
-    private enum Direction {
-        TOP_LEFT(-1, -1),
-        TOP(0,-1),
-        TOP_RIGHT(1,-1),
-        LEFT(-1, 0),
-        RIGHT(1,0),
-        BOTTOM_LEFT(-1, 1),
-        BOTTOM(0, 1),
-        BOTTOM_RIGHT(1, 1);
-
-        public int relativePosX;
-        public int relativePosY;
-
-       Direction(int relativePosX, int relativePosY) {
-            this.relativePosX = relativePosX;
-            this.relativePosY = relativePosY;
-        }
-
-        public Direction reverse() {
-            switch (this) {
-                case TOP_LEFT:      return BOTTOM_RIGHT;
-                case TOP :          return BOTTOM;
-                case TOP_RIGHT:     return BOTTOM_LEFT;
-                case LEFT:          return RIGHT;
-                case RIGHT:         return LEFT;
-                case BOTTOM_LEFT:   return TOP_RIGHT;
-                case BOTTOM:        return TOP;
-                default:            return TOP_LEFT;
-            }
-
         }
     }
 

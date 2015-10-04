@@ -1,32 +1,34 @@
 package ca.csf.connect4;
 
+import ca.csf.connect4.Cell.CellType;
+
 /**
  * Created by dom on 25/09/15.
  */
 public class Game {
+    public static final int DEFAULT_NB_PLAYERS = 2;
 
-    private final int NB_PLAYERS = 2;
+    private Board board;
     private int playerTurn;
 
-    public Game(int nbPlayers) {
+    public Game() {
         board = new Board();
     }
-    private Board board;
 
     public void start() {
         playerTurn = 0;
     }
 
     public void playTurn(int dropCoord) throws Exception {
-        Cell.CellType tokenToPlay = Cell.CellType.EMPTY;
+        CellType tokenToPlay = CellType.EMPTY;
 
         switch (playerTurn) {
             case 0:
-                tokenToPlay = Cell.CellType.RED;
+                tokenToPlay = CellType.RED;
                 playerTurn = 1;
                 break;
             case 1:
-                tokenToPlay = Cell.CellType.BLACK;
+                tokenToPlay = CellType.BLACK;
                 playerTurn = 0;
                 break;
         }

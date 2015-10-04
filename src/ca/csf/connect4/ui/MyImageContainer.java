@@ -15,8 +15,7 @@ public class MyImageContainer extends JLabel
 	private ImageIcon icon = null;
 	private int borderSize = 1;
 	
-	public MyImageContainer()
-	{
+	public MyImageContainer() {
 		super();
 		super.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 	}

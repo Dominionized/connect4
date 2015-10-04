@@ -1,34 +1,18 @@
 package ca.csf.connect4;
 
+import javax.swing.*;
+import java.io.IOException;
+
 /**
  * Created by dom on 25/09/15.
  */
 public class Main {
     public static void main(String[] args) {
-        Board board = new Board();
-
-        board.debugCellArray();
-
         try {
-            board.dropToken(0, Cell.CellType.RED);
-            board.dropToken(0, Cell.CellType.BLACK);
-            board.dropToken(0, Cell.CellType.BLACK);
-            board.dropToken(0, Cell.CellType.RED);
-            board.dropToken(1, Cell.CellType.RED);
-            board.dropToken(1, Cell.CellType.BLACK);
-            board.dropToken(1, Cell.CellType.RED);
-            board.dropToken(2, Cell.CellType.RED);
-            board.dropToken(2, Cell.CellType.RED);
-            board.dropToken(3, Cell.CellType.RED);
-            board.debugCellArray();
+            Connect4Controller ctrl = new Connect4Controller();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Could not load all resources. Exiting.");
+            System.exit(1);
         }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        System.out.println(board.checkAround(0, 2, 4));
-
-
-        Connect4Controller ctrl = new Connect4Controller();
     }
 }
