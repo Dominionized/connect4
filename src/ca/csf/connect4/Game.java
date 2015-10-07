@@ -2,17 +2,22 @@ package ca.csf.connect4;
 
 import ca.csf.connect4.Cell.CellType;
 
+import java.util.ArrayList;
+
 /**
  * Created by dom on 25/09/15.
  */
-public class Game {
+public class Game implements Observable {
     public static final int DEFAULT_NB_PLAYERS = 2;
 
     private Board board;
     private int playerTurn;
 
+    private ArrayList<Observer> observers;
+
     public Game() {
         board = new Board();
+        observers = new ArrayList<Observer>();
     }
 
     public void start() {
@@ -60,4 +65,21 @@ public class Game {
         return board.getSizeY();
     }
 
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void unregisterObserver(Observer observer) {
+        if (!observers.remove(observer))
+            System.err.println("Could not remove given observer");
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
+    }
 }
