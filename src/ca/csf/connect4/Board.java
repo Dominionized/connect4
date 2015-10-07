@@ -6,8 +6,8 @@ import ca.csf.connect4.Cell.CellType;
  */
 public class Board {
 
-    private final static int DEFAULT_SIZE_X = 6;
-    private final static int DEFAULT_SIZE_Y = 7;
+    private final static int DEFAULT_SIZE_X = 7;
+    private final static int DEFAULT_SIZE_Y = 6;
 
     private int sizeX;
     private int sizeY;
@@ -53,6 +53,10 @@ public class Board {
         }
     }
 
+    public Board() {
+        this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+    }
+
     public Board(int sizeX, int sizeY) {
         cellArray = new Cell[sizeX][sizeY];
         this.sizeX = sizeX;
@@ -66,10 +70,6 @@ public class Board {
                 cellArray[i][j] = new Cell(Cell.CellType.EMPTY);
             }
         }
-    }
-
-    public Board() {
-        this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
     }
 
     public Cell[][] getCellArray() {

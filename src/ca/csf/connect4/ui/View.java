@@ -99,7 +99,6 @@ public class View extends JFrame
 	{
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension screenSize = toolkit.getScreenSize();
-		;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(((screenSize.width * 3) / 6), ((screenSize.height * 4) / 7));
 		setLocation(((screenSize.width - getWidth()) / 2), ((screenSize.height - getHeight()) / 2));
