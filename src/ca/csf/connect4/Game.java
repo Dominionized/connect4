@@ -1,6 +1,7 @@
 package ca.csf.connect4;
 
 import ca.csf.connect4.Cell.CellType;
+import ca.csf.connect4.ui.UiText;
 
 import java.util.ArrayList;
 
@@ -9,15 +10,24 @@ import java.util.ArrayList;
  */
 public class Game implements Observable {
     public static final int DEFAULT_NB_PLAYERS = 2;
+    private int nbCellsToWin = 4;
+
+    private static final String BLACK_PLAYER_NAME = "Black player";
+    private static final String RED_PLAYER_NAME = "Red player";
 
     private Board board;
-    private int playerTurn;
 
+    private int playerTurn;
     private ArrayList<Observer> observers;
 
-    public Game() {
-        board = new Board();
+    private boolean won;
+    private boolean resigned;
+
+    public Game(int sizeX, int sizeY) {
+        board = new Board(sizeX, sizeY);
         observers = new ArrayList<Observer>();
+        won = false;
+        resigned = false;
     }
 
     public void start() {
@@ -39,22 +49,14 @@ public class Game implements Observable {
         }
 
         board.dropToken(dropCoord, tokenToPlay);
+        if (won(board.getLastChangedCellX(),board.getLastChangedCellY())) {
+            won = true;
+        }
+        notifyObservers();
     }
 
     public Cell[][] getBoardArray() {
         return board.getCellArray();
-    }
-
-    public Cell getLastChangedCell() {
-        return board.getLastChangedCell();
-    }
-
-    public int getLastChangedCellX() {
-        return board.getLastChangedCellX();
-    }
-
-    public int getLastChangedCellY() {
-        return board.getLastChangedCellY();
     }
 
     public int getSizeX() {
@@ -79,7 +81,56 @@ public class Game implements Observable {
     @Override
     public void notifyObservers() {
         for (Observer observer : observers) {
-            observer.update();
+            if (board.getLastChangedCellType() != CellType.EMPTY) {
+                observer.updateCell(board.getLastChangedCellX(),
+                        board.getLastChangedCellY(),
+                        board.getLastChangedCellType());
+            }
+            for (int stack : board.getFilledStacks()) {
+                if (stack == board.getLastChangedCellX()) {
+                    observer.stackFull(stack);
+                }
+            }
+            if (won) {
+                observer.gameWon(whoWins());
+            }
+            if (board.isFull()) {
+                observer.boardFull();
+            }
+            if (resigned) {
+                observer.gameResigned(whoWins());
+            }
         }
+    }
+
+    public boolean won(int x, int y) {
+        return board.checkAround(x, y, nbCellsToWin);
+    }
+
+    public void resign() {
+        this.resigned = true;
+        notifyObservers();
+    }
+
+    private String whoWins() {
+        return (board.getLastChangedCellType() == CellType.BLACK) ? BLACK_PLAYER_NAME : RED_PLAYER_NAME;
+    }
+
+    public int getPlayerTurn() {
+        return playerTurn;
+    }
+
+    public String playerNumberToColor(int playerNumber) {
+        switch(playerNumber) {
+            case 0:
+                return UiText.RED;
+            case 1:
+                return UiText.BLACK;
+        }
+        return "";
+    }
+
+    public void setNbCellsToWin(int nbCellsToWin) {
+        this.nbCellsToWin = nbCellsToWin;
     }
 }

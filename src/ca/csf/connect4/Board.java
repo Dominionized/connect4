@@ -1,20 +1,18 @@
 package ca.csf.connect4;
 import ca.csf.connect4.Cell.CellType;
 
-/**
- * Created by dom on 25/09/15.
- */
-public class Board {
+import java.util.ArrayList;
+import java.util.List;
 
-    private final static int DEFAULT_SIZE_X = 7;
-    private final static int DEFAULT_SIZE_Y = 6;
+public class Board {
 
     private int sizeX;
     private int sizeY;
 
-    private Cell[][] cellArray;
+    private List<Integer> filledStacks;
 
-    private Cell lastChangedCell;
+    private Cell[][] cellArray;
+    private CellType lastChangedCellType;
     private int lastChangedCellX;
     private int lastChangedCellY;
 
@@ -53,14 +51,12 @@ public class Board {
         }
     }
 
-    public Board() {
-        this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
-    }
-
     public Board(int sizeX, int sizeY) {
         cellArray = new Cell[sizeX][sizeY];
         this.sizeX = sizeX;
         this.sizeY = sizeY;
+        this.filledStacks = new ArrayList<Integer>();
+        this.lastChangedCellType = CellType.EMPTY;
         initializeCells();
     }
 
@@ -81,10 +77,14 @@ public class Board {
             throw new Exception("Stack full");
         }
 
+        if (cellArray[posX][1].cellType != Cell.CellType.EMPTY) {
+            filledStacks.add(posX); // Stack is filled. You can no longer add items to it.
+        }
+
         for (int i = 0; i < sizeY; i++) {
             if (!inBounds(posX, i + 1) || (cellArray[posX][i + 1].cellType != Cell.CellType.EMPTY)) {
                 cellArray[posX][i].cellType = cellType;
-                lastChangedCell = cellArray[posX][i];
+                lastChangedCellType = cellArray[posX][i].cellType;
                 lastChangedCellX = posX;
                 lastChangedCellY = i;
                 return;
@@ -138,14 +138,15 @@ public class Board {
                         System.out.print(".");
                         break;
                 }
+                System.out.print(Integer.toString(i)+Integer.toString(j));
             }
             System.out.print("\n");
         }
         System.out.println();
     }
 
-    public Cell getLastChangedCell() {
-        return lastChangedCell;
+    public CellType getLastChangedCellType() {
+        return lastChangedCellType;
     }
 
     public int getLastChangedCellX() {
@@ -163,4 +164,9 @@ public class Board {
     public int getSizeY() {
         return sizeY;
     }
+
+    public List<Integer> getFilledStacks() {
+        return filledStacks;
+    }
+
 }
