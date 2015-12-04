@@ -1,4 +1,6 @@
-package ca.csf.connect4;
+package ca.csf.connect4.client;
+
+import ca.csf.connect4.server.model.Cell;
 
 /**
  * Created by Anthony on 06/10/2015.

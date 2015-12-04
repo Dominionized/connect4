@@ -1,7 +1,7 @@
-package ca.csf.connect4;
+package ca.csf.connect4.server.model;
 
-import ca.csf.connect4.Cell.CellType;
-import ca.csf.connect4.ui.UiText;
+import ca.csf.connect4.client.Observer;
+import ca.csf.connect4.client.ui.UiText;
 
 import java.util.ArrayList;
 
@@ -35,15 +35,15 @@ public class Game implements Observable {
     }
 
     public void playTurn(int dropCoord) throws Exception {
-        CellType tokenToPlay = CellType.EMPTY;
+        Cell.CellType tokenToPlay = Cell.CellType.EMPTY;
 
         switch (playerTurn) {
             case 0:
-                tokenToPlay = CellType.RED;
+                tokenToPlay = Cell.CellType.RED;
                 playerTurn = 1;
                 break;
             case 1:
-                tokenToPlay = CellType.BLACK;
+                tokenToPlay = Cell.CellType.BLACK;
                 playerTurn = 0;
                 break;
         }
@@ -81,7 +81,7 @@ public class Game implements Observable {
     @Override
     public void notifyObservers() {
         for (Observer observer : observers) {
-            if (board.getLastChangedCellType() != CellType.EMPTY) {
+            if (board.getLastChangedCellType() != Cell.CellType.EMPTY) {
                 observer.updateCell(board.getLastChangedCellX(),
                         board.getLastChangedCellY(),
                         board.getLastChangedCellType());
@@ -113,7 +113,7 @@ public class Game implements Observable {
     }
 
     private String whoWins() {
-        return (board.getLastChangedCellType() == CellType.BLACK) ? BLACK_PLAYER_NAME : RED_PLAYER_NAME;
+        return (board.getLastChangedCellType() == Cell.CellType.BLACK) ? BLACK_PLAYER_NAME : RED_PLAYER_NAME;
     }
 
     public int getPlayerTurn() {

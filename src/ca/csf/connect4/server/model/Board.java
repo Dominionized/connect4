@@ -1,5 +1,5 @@
-package ca.csf.connect4;
-import ca.csf.connect4.Cell.CellType;
+package ca.csf.connect4.server.model;
+import ca.csf.connect4.server.model.Cell.CellType;
 
 import java.util.ArrayList;
 import java.util.List;

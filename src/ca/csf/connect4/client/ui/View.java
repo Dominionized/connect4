@@ -1,8 +1,6 @@
-package ca.csf.connect4.ui;
+package ca.csf.connect4.client.ui;
 
-import ca.csf.connect4.Cell;
-import ca.csf.connect4.Connect4Controller;
-import ca.csf.connect4.Observer;
+import ca.csf.connect4.client.ClientController;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,11 +18,11 @@ public class View extends JFrame {
     private final JTextField message = new JTextField(20);
     private final JPanel centerPane = new JPanel();
 
-    private Connect4Controller controller;
+    private ClientController controller;
     private JButton[] controlButtons;
     private MyImageContainer[][] placeHolders;
 
-	public View(Connect4Controller controller)
+	public View(ClientController controller)
 	{
         this.controller = controller;
 

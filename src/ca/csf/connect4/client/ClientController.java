@@ -1,13 +1,19 @@
-package ca.csf.connect4;
+package ca.csf.connect4.client;
 
-import ca.csf.connect4.ui.UiText;
-import ca.csf.connect4.ui.View;
+import ca.csf.connect4.client.ui.UiText;
+import ca.csf.connect4.client.ui.View;
+import ca.csf.connect4.server.IServer;
+import ca.csf.connect4.server.model.Cell;
+import ca.csf.connect4.server.model.Game;
+import ca.csf.connect4.shared.NetConfig;
+import net.sf.lipermi.handler.CallHandler;
+import net.sf.lipermi.net.Client;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.IOException;
 
-public class Connect4Controller implements Observer {
+public class ClientController implements Observer {
     private static final String iconsPath = "/resources/";
     private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
 
@@ -21,9 +27,17 @@ public class Connect4Controller implements Observer {
 
     private View view;
     private Game game;
+    private IServer server;
     private ImageIcon[] icons;
 
-    public Connect4Controller(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
+    public ClientController(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
+        this(NetConfig.DEFAULT_PORT, sizeX, sizeY, nbCellsToWin);
+    }
+
+    public ClientController(int port, int sizeX, int sizeY, int nbCellsToWin) throws IOException {
+        CallHandler callHandler = new CallHandler();
+        Client client = new Client("127.0.0.1", port, callHandler);
+        server = client.getGlobal(IServer.class);
         view = new View(this);
         game = new Game(sizeX, sizeY);
         game.registerObserver(this);
@@ -37,7 +51,7 @@ public class Connect4Controller implements Observer {
         initIcons();
     }
 
-    public Connect4Controller() throws IOException {
+    public ClientController() throws IOException {
         this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y, DEFAULT_NB_CELLS_TO_WIN);
     }
 
