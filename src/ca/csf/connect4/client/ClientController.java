@@ -5,6 +5,7 @@ import ca.csf.connect4.client.ui.View;
 import ca.csf.connect4.server.IServer;
 import ca.csf.connect4.server.model.Cell;
 import ca.csf.connect4.server.model.Game;
+import ca.csf.connect4.shared.IController;
 import ca.csf.connect4.shared.NetConfig;
 import net.sf.lipermi.handler.CallHandler;
 import net.sf.lipermi.net.Client;
@@ -13,7 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.IOException;
 
-public class ClientController implements Observer {
+public class ClientController implements Observer, IController {
     private static final String iconsPath = "/resources/";
     private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
 
@@ -31,10 +32,10 @@ public class ClientController implements Observer {
     private ImageIcon[] icons;
 
     public ClientController(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
-        this(NetConfig.DEFAULT_PORT, sizeX, sizeY, nbCellsToWin);
+        this(NetConfig.DEFAULT_PORT);
     }
 
-    public ClientController(int port, int sizeX, int sizeY, int nbCellsToWin) throws IOException {
+    public ClientController(int port) throws IOException {
         CallHandler callHandler = new CallHandler();
         Client client = new Client("127.0.0.1", port, callHandler);
         server = client.getGlobal(IServer.class);
@@ -45,9 +46,6 @@ public class ClientController implements Observer {
 
         view.initBoard(sizeY, sizeX);
 
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.nbCellsToWin = nbCellsToWin;
         initIcons();
     }
 
@@ -82,6 +80,8 @@ public class ClientController implements Observer {
         view.initBoard(game.getSizeY(), game.getSizeX());
         view.enableAllControlButtons();
     }
+
+    publi
 
     @Override
     public void updateCell(int x, int y, Cell.CellType type) {
