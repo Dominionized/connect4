@@ -22,29 +22,22 @@ public class ClientController implements Observer, IController {
     private static final int DEFAULT_SIZE_Y = 6;
     private static final int DEFAULT_NB_CELLS_TO_WIN = 4;
 
-    private int sizeX;
-    private int sizeY;
-    private int nbCellsToWin;
-
     private View view;
-    private Game game;
+
     private IServer server;
     private ImageIcon[] icons;
 
     public ClientController(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
-        this(NetConfig.DEFAULT_PORT);
+        this(NetConfig.DEFAULT_ADDRESS, NetConfig.DEFAULT_PORT);
     }
 
-    public ClientController(int port) throws IOException {
+    public ClientController(String address, int port) throws IOException {
         CallHandler callHandler = new CallHandler();
-        Client client = new Client("127.0.0.1", port, callHandler);
+        Client client = new Client(address, port, callHandler);
         server = client.getGlobal(IServer.class);
         view = new View(this);
-        game = new Game(sizeX, sizeY);
-        game.registerObserver(this);
-        game.setNbCellsToWin(nbCellsToWin);
 
-        view.initBoard(sizeY, sizeX);
+        view.initBoard(server.getSizeX(), server.getSizeY());
 
         initIcons();
     }
@@ -63,25 +56,12 @@ public class ClientController implements Observer, IController {
             pathBuilder.delete(0, pathBuilder.length());
         }
     }
-    public void dropToken(int pos) {
-        try {
-            game.playTurn(pos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public void resign() {
-        game.resign();
-    }
+
     private void restartGame() {
-        game = new Game(sizeX, sizeY);
-        game.registerObserver(this);
-        game.setNbCellsToWin(nbCellsToWin);
-        view.initBoard(game.getSizeY(), game.getSizeX());
+        server.restartGame();
+        view.initBoard(server.getSizeY(), server.getSizeX());
         view.enableAllControlButtons();
     }
-
-    publi
 
     @Override
     public void updateCell(int x, int y, Cell.CellType type) {
