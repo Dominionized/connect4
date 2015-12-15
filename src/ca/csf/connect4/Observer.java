@@ -1,5 +1,7 @@
 package ca.csf.connect4;
 
+import ca.csf.connect4.server.models.Cell;
+
 /**
  * Created by Anthony on 06/10/2015.
  */

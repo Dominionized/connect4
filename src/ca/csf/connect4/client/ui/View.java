@@ -1,8 +1,9 @@
-package ca.csf.connect4.ui;
+package ca.csf.connect4.client.ui;
 
-import ca.csf.connect4.Cell;
-import ca.csf.connect4.Connect4Controller;
 import ca.csf.connect4.Observer;
+import ca.csf.connect4.client.ClientController;
+import ca.csf.connect4.server.ServerController;
+import ca.csf.connect4.server.models.Cell;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,17 +15,17 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-public class View extends JFrame {
+public class View extends JFrame implements Observer {
 	private static final long serialVersionUID = 1L;
 
     private final JTextField message = new JTextField(20);
     private final JPanel centerPane = new JPanel();
 
-    private Connect4Controller controller;
+    private ClientController controller;
     private JButton[] controlButtons;
     private MyImageContainer[][] placeHolders;
 
-	public View(Connect4Controller controller)
+	public View(ServerController controller)
 	{
         this.controller = controller;
 
@@ -113,6 +114,31 @@ public class View extends JFrame {
     public JTextField getMessage() {
         return message;
     }
+
+	@Override
+	public void updateCell(int x, int y, Cell.CellType type) {
+
+	}
+
+	@Override
+	public void gameWon(String winner) {
+
+	}
+
+	@Override
+	public void stackFull(int x) {
+
+	}
+
+	@Override
+	public void boardFull() {
+
+	}
+
+	@Override
+	public void gameResigned(String winner) {
+
+	}
 
 	private class ButtonHandler implements ActionListener
 	{

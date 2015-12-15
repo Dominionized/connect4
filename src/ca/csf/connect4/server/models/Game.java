@@ -1,7 +1,11 @@
-package ca.csf.connect4;
+package ca.csf.connect4.server.models;
 
-import ca.csf.connect4.Cell.CellType;
-import ca.csf.connect4.ui.UiText;
+import ca.csf.connect4.Observer;
+import ca.csf.connect4.server.models.Cell;
+import ca.csf.connect4.server.models.Cell.CellType;
+import ca.csf.connect4.server.Observable;
+import ca.csf.connect4.client.ui.UiText;
+import ca.csf.connect4.server.models.Board;
 
 import java.util.ArrayList;
 

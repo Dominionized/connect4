@@ -1,4 +1,4 @@
-package ca.csf.connect4.ui;
+package ca.csf.connect4.client.ui;
 
 import java.awt.Color;
 import java.awt.Graphics;

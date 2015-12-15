@@ -1,4 +1,4 @@
-package ca.csf.connect4.ui;
+package ca.csf.connect4.client.ui;
 
 /**
  * Created by dom on 07/10/15.

@@ -1,18 +1,20 @@
 package ca.csf.connect4;
 
+import ca.csf.connect4.server.ServerController;
+
 import javax.swing.*;
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        Connect4Controller ctrl;
+        ServerController ctrl;
         try {
             if (args.length == 3) {
-                ctrl = new Connect4Controller(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
+                ctrl = new ServerController(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
                         Integer.parseInt(args[2]));
             }
             else {
-                ctrl = new Connect4Controller();
+                ctrl = new ServerController();
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Could not load all resources. Exiting.");

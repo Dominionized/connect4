@@ -1,13 +1,16 @@
-package ca.csf.connect4;
+package ca.csf.connect4.server;
 
-import ca.csf.connect4.ui.UiText;
-import ca.csf.connect4.ui.View;
+import ca.csf.connect4.server.models.Cell;
+import ca.csf.connect4.server.models.Game;
+import ca.csf.connect4.Observer;
+import ca.csf.connect4.client.ui.UiText;
+import ca.csf.connect4.client.ui.View;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.IOException;
 
-public class Connect4Controller implements Observer {
+public class ServerController implements Server{
     private static final String iconsPath = "/resources/";
     private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
 
@@ -23,7 +26,7 @@ public class Connect4Controller implements Observer {
     private Game game;
     private ImageIcon[] icons;
 
-    public Connect4Controller(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
+    public ServerController(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
         view = new View(this);
         game = new Game(sizeX, sizeY);
         game.registerObserver(this);
@@ -37,7 +40,7 @@ public class Connect4Controller implements Observer {
         initIcons();
     }
 
-    public Connect4Controller() throws IOException {
+    public ServerController() throws IOException {
         this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y, DEFAULT_NB_CELLS_TO_WIN);
     }
 

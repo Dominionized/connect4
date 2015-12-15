@@ -1,4 +1,6 @@
-package ca.csf.connect4;
+package ca.csf.connect4.server;
+
+import ca.csf.connect4.Observer;
 
 /**
  * Created by Anthony on 06/10/2015.
