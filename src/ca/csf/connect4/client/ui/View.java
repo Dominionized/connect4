@@ -25,7 +25,7 @@ public class View extends JFrame implements Observer {
     private JButton[] controlButtons;
     private MyImageContainer[][] placeHolders;
 
-	public View(ServerController controller)
+	public View(ClientController controller)
 	{
         this.controller = controller;
 

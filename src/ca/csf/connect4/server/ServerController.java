@@ -11,49 +11,14 @@ import javax.swing.*;
 import java.io.IOException;
 
 public class ServerController implements Server{
-    private static final String iconsPath = "/resources/";
-    private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
 
-    private static final int DEFAULT_SIZE_X = 7;
-    private static final int DEFAULT_SIZE_Y = 6;
-    private static final int DEFAULT_NB_CELLS_TO_WIN = 4;
-
-    private int sizeX;
-    private int sizeY;
-    private int nbCellsToWin;
-
-    private View view;
+    private ServerConfig config;
     private Game game;
-    private ImageIcon[] icons;
 
-    public ServerController(int sizeX, int sizeY, int nbCellsToWin) throws IOException {
-        view = new View(this);
-        game = new Game(sizeX, sizeY);
-        game.registerObserver(this);
-        game.setNbCellsToWin(nbCellsToWin);
-
-        view.initBoard(sizeY, sizeX);
-
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.nbCellsToWin = nbCellsToWin;
-        initIcons();
+    public ServerController(ServerConfig config) throws IOException {
+        this.config = config;
     }
 
-    public ServerController() throws IOException {
-        this(DEFAULT_SIZE_X, DEFAULT_SIZE_Y, DEFAULT_NB_CELLS_TO_WIN);
-    }
-
-    private void initIcons() throws IOException {
-        int numberPlayers = Game.DEFAULT_NB_PLAYERS;
-        icons = new ImageIcon[numberPlayers];
-        StringBuilder pathBuilder = new StringBuilder();
-        for (int i = 0; i < numberPlayers; ++i) {
-            String path = pathBuilder.append(iconsPath).append(iconsName[i]).toString();
-            icons[i] = new ImageIcon(ImageIO.read(getClass().getResourceAsStream(path)));
-            pathBuilder.delete(0, pathBuilder.length());
-        }
-    }
     public void dropToken(int pos) {
         try {
             game.playTurn(pos);
@@ -61,11 +26,17 @@ public class ServerController implements Server{
             e.printStackTrace();
         }
     }
+
+    // Notify all observers of winner.
     public void resign() {
         game.resign();
     }
+
+    // Split this method.
+    // Have the client reset his UI.
+    // Have the server reset the model.
     private void restartGame() {
-        game = new Game(sizeX, sizeY);
+        game = new Game(this.config.getColumns(), this.config.getColumns());
         game.registerObserver(this);
         game.setNbCellsToWin(nbCellsToWin);
         view.initBoard(game.getSizeY(), game.getSizeX());
