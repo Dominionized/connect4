@@ -1,5 +1,7 @@
 package ca.csf.connect4.server.models;
-import ca.csf.connect4.server.models.Cell.CellType;
+// Shared module dependencies
+import ca.csf.connect4.shared.models.Cell;
+import ca.csf.connect4.shared.models.Cell.CellType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,7 +167,7 @@ public class Board {
         return sizeY;
     }
 
-    public List<Integer> getFilledStacks() {
+    public List<Integer> getFilledColumns() {
         return filledStacks;
     }
 

@@ -1,6 +1,4 @@
-package ca.csf.connect4.server;
-
-import ca.csf.connect4.Observer;
+package ca.csf.connect4.shared;
 
 /**
  * Created by Anthony on 06/10/2015.
@@ -8,5 +6,4 @@ import ca.csf.connect4.Observer;
 public interface Observable {
     public void registerObserver(Observer observer);
     public void unregisterObserver(Observer observer);
-    public void notifyObservers();
 }

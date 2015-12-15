@@ -7,6 +7,7 @@ package ca.csf.connect4.server;
 public class ServerConfig {
 
     public static final int DEFAULT_LISTEN_PORT = 7331;
+    public static final long DEFAULT_POLL_INTERVAL_MS = 500;
     public static final int DEFAULT_ROW_COUNT = 6;
     public static final int DEFAULT_COLUMN_COUNT = 7;
     public static final int DEFAULT_NB_CELLS_TO_WIN = 4;

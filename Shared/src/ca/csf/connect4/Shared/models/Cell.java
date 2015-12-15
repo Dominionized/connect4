@@ -1,4 +1,4 @@
-package ca.csf.connect4.server.models;
+package ca.csf.connect4.shared.models;
 
 public class Cell {
     public CellType cellType;

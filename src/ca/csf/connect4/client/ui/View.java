@@ -1,8 +1,7 @@
 package ca.csf.connect4.client.ui;
 
-import ca.csf.connect4.Observer;
+import ca.csf.connect4.shared.Observer;
 import ca.csf.connect4.client.ClientController;
-import ca.csf.connect4.server.ServerController;
 import ca.csf.connect4.server.models.Cell;
 
 import java.awt.BorderLayout;
@@ -126,7 +125,7 @@ public class View extends JFrame implements Observer {
 	}
 
 	@Override
-	public void stackFull(int x) {
+	public void columnFull(int x) {
 
 	}
 

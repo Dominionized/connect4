@@ -1,31 +1,65 @@
 package ca.csf.connect4.server;
 
-import ca.csf.connect4.server.models.Cell;
-import ca.csf.connect4.server.models.Game;
-import ca.csf.connect4.Observer;
-import ca.csf.connect4.client.ui.UiText;
-import ca.csf.connect4.client.ui.View;
+// Shared module dependencies
+import ca.csf.connect4.shared.Connect4Server;
+import ca.csf.connect4.shared.models.Cell;
 
-import javax.imageio.ImageIO;
+import ca.csf.connect4.server.models.Game;
+import ca.csf.connect4.client.ui.UiText;
+import net.sf.lipermi.exception.LipeRMIException;
+import net.sf.lipermi.handler.CallHandler;
+import net.sf.lipermi.net.IServerListener;
+import net.sf.lipermi.net.Server;
+
 import javax.swing.*;
 import java.io.IOException;
+import java.net.Socket;
+import java.time.LocalDateTime;
 
-public class ServerController implements Server{
+public class ServerController extends Server implements Connect4Server {
 
+    private class ServerListener implements IServerListener {
+        @Override
+        public void clientConnected(Socket socket) {
+            System.out.format("[%s] : Client connected from %s%n", LocalDateTime.now().toString(), socket.getInetAddress().toString());
+        }
+
+        @Override
+        public void clientDisconnected(Socket socket) {
+            System.out.format("[%s] : Client disconnected from %s%n", LocalDateTime.now().toString(), socket.getInetAddress().toString());
+        }
+    }
+
+    private CallHandler handler;
     private ServerConfig config;
     private Game game;
 
     public ServerController(ServerConfig config) throws IOException {
         this.config = config;
+        try {
+            this.handler.registerGlobal(Connect4Server.class, this);
+            this.bind(ServerConfig.DEFAULT_LISTEN_PORT, handler);
+            this.addServerListener(new ServerListener());
+            while (true) {
+                Thread.sleep(ServerConfig.DEFAULT_POLL_INTERVAL_MS);
+            }
+        } catch (LipeRMIException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void dropToken(int pos) {
         try {
-            game.playTurn(pos);
+            game.dropToken(pos);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
     // Notify all observers of winner.
     public void resign() {
@@ -36,11 +70,15 @@ public class ServerController implements Server{
     // Have the client reset his UI.
     // Have the server reset the model.
     private void restartGame() {
-        game = new Game(this.config.getColumns(), this.config.getColumns());
-        game.registerObserver(this);
-        game.setNbCellsToWin(nbCellsToWin);
-        view.initBoard(game.getSizeY(), game.getSizeX());
-        view.enableAllControlButtons();
+        this.game = new Game(this.config.getColumns(),
+                             this.config.getRows(),
+                             this.config.getTokenCountWin());
+        this.
+//        game = new Game(this.config.getColumns(), this.config.getColumns());
+//        game.registerObserver(this);
+//        game.setTokenCountWin(nbCellsToWin);
+//        view.initBoard(game.getSizeY(), game.getSizeX());
+//        view.enableAllControlButtons();
     }
 
     @Override
