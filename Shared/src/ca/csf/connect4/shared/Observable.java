@@ -5,5 +5,5 @@ package ca.csf.connect4.shared;
  */
 public interface Observable {
     public void registerObserver(Observer observer);
-    public void unregisterObserver(Observer observer);
+    public void unregisterObserver(Observer observer) throws Exception;
 }

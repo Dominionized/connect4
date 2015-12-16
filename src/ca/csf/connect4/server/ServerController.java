@@ -2,17 +2,16 @@ package ca.csf.connect4.server;
 
 // Shared module dependencies
 import ca.csf.connect4.shared.Connect4Server;
+import ca.csf.connect4.shared.GameConfig;
 import ca.csf.connect4.shared.NetworkConfig;
-import ca.csf.connect4.shared.models.Cell;
 
 import ca.csf.connect4.server.models.Game;
-import ca.csf.connect4.client.ui.UiText;
+import ca.csf.connect4.shared.Observer;
 import net.sf.lipermi.exception.LipeRMIException;
 import net.sf.lipermi.handler.CallHandler;
 import net.sf.lipermi.net.IServerListener;
 import net.sf.lipermi.net.Server;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDateTime;
@@ -20,9 +19,17 @@ import java.time.LocalDateTime;
 public class ServerController extends Server implements Connect4Server {
 
     private class ServerListener implements IServerListener {
+
+        private ServerController controller;
+
+        public ServerListener(ServerController controller) {
+
+        }
+
         @Override
         public void clientConnected(Socket socket) {
             System.out.format("[%s] : Client connected from %s%n", LocalDateTime.now().toString(), socket.getInetAddress().toString());
+            this.controller.getGame().
         }
 
         @Override
@@ -33,17 +40,20 @@ public class ServerController extends Server implements Connect4Server {
 
     public static final long DEFAULT_POLL_INTERVAL_MS = 500;
 
+    private IServerListener serverListener;
     private CallHandler handler;
     private GameConfig config;
     private Game game;
 
     public ServerController(GameConfig config) throws IOException {
         this.config = config;
+        this.game = new Game(this.config);
         this.handler = new CallHandler();
         try {
             this.handler.registerGlobal(Connect4Server.class, this);
             this.bind(NetworkConfig.DEFAULT_LISTEN_PORT, handler);
-            this.addServerListener(new ServerListener());
+            this.serverListener = new ServerListener(this);
+            this.addServerListener(this.serverListener);
             System.out.println("Server is listening on port " + NetworkConfig.DEFAULT_LISTEN_PORT);
             while (true) {
                 Thread.sleep(DEFAULT_POLL_INTERVAL_MS);
@@ -54,6 +64,11 @@ public class ServerController extends Server implements Connect4Server {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public GameConfig getConfig() {
+        return this.config;
     }
 
     @Override
@@ -70,6 +85,16 @@ public class ServerController extends Server implements Connect4Server {
         game.resign();
     }
 
+    @Override
+    public void connect(Observer observer) {
+        this.serverListener.
+    }
+
+    @Override
+    public void disconnect() {
+
+    }
+
     // Split this method.
     // Have the client reset his UI.
     // Have the server reset the model.
@@ -79,7 +104,10 @@ public class ServerController extends Server implements Connect4Server {
 //        game.registerObserver(this);
 //        game.setTokenCountWin(nbCellsToWin);
 //        view.initBoard(game.getSizeY(), game.getSizeX());
-//        view.enableAllControlButtons();
+//        view.changeControlButtonsEnableState();
     }
 
+    public Game getGame() {
+        return game;
+    }
 }

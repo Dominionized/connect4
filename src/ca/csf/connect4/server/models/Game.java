@@ -1,7 +1,7 @@
 package ca.csf.connect4.server.models;
 
 // Shared module dependencies
-import ca.csf.connect4.server.GameConfig;
+import ca.csf.connect4.shared.GameConfig;
 import ca.csf.connect4.shared.Observable;
 import ca.csf.connect4.shared.models.Cell;
 import ca.csf.connect4.shared.models.Cell.CellType;
@@ -9,7 +9,9 @@ import ca.csf.connect4.shared.models.Cell.CellType;
 import ca.csf.connect4.shared.Observer;
 import ca.csf.connect4.client.ui.UiText;
 
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -23,7 +25,7 @@ public class Game implements Observable {
 
     private GameConfig config;
     private Board board;
-    private List<Observer> observers;
+    private HashMap<Socket, Observer> observers;
 
     private int playerTurn;
     private volatile boolean gameOver;
@@ -31,7 +33,7 @@ public class Game implements Observable {
     public Game(GameConfig config) {
         this.config = config;
         this.board = new Board(this.config.getColumns(), this.config.getRows());
-        this.observers = new ArrayList<Observer>();
+        this.observers = new HashMap<Socket, Observer>();
         this.playerTurn = 0;
     }
 
@@ -55,12 +57,17 @@ public class Game implements Observable {
         update();
     }
 
+    public void disconnect(Observer disconnectedObserver) {
+        unregisterObserver(disconnectedObserver);
+        this.observers.forEach(observer -> observer.gameResigned(whoWins()));
+    }
+
     private void update() {
         if (board.getLastChangedCellType() != CellType.EMPTY) {
             int x = this.board.getLastChangedCellX();
             int y = this.board.getLastChangedCellY();
             CellType cellType = this.board.getLastChangedCellType();
-            this.observers.forEach(observer -> observer.updateCell(x, y, cellType, playerNumberToColor(this.playerTurn)));
+            this.observers.forEach(observer -> observer.updateCell(x, y, cellType));
         }
     }
 
@@ -127,15 +134,15 @@ public class Game implements Observable {
         return "";
     }
 
-    @Override
+    @Overridee
     public void registerObserver(Observer observer) {
         this.observers.add(observer);
     }
 
     @Override
-    public void unregisterObserver(Observer observer) {
+    public void unregisterObserver(Observer observer) throws Exception {
         if (!observers.remove(observer))
-            System.err.println("Could not remove given observer");
+            throw new Exception("Observer not found");
     }
 
 }

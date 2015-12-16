@@ -1,6 +1,6 @@
 package ca.csf.connect4.server;
 
-import ca.csf.connect4.server.models.Game;
+import ca.csf.connect4.shared.GameConfig;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

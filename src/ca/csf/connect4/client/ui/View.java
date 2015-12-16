@@ -35,6 +35,14 @@ public class View extends JFrame implements Observer {
     private MyImageContainer[][] placeHolders;
 
 	public View(ClientController controller) {
+		try {
+			initIcons();
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, UiText.Errors.LOAD_RESOURCES_FAILED,
+					UiText.Errors.ERROR_OCCURED,
+					JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
+		}
 		this.controller = controller;
 
 		this.setTitle("Connect4");
@@ -119,14 +127,11 @@ public class View extends JFrame implements Observer {
     public void disableControlButton(int x) {
         controlButtons[x].setEnabled(false);
     }
-	public void enableAllControlButtons() {
+	public void changeControlButtonsEnableState(boolean state) {
         for (JButton button : controlButtons) {
-            button.setEnabled(true);
+            button.setEnabled(state);
         }
 	}
-    public JTextField getMessage() {
-        return message;
-    }
 
 	@Override
 	public void gameWon(String winner) {
@@ -135,6 +140,7 @@ public class View extends JFrame implements Observer {
 				.append(winner)
 				.append(UiText.WINS_THE_GAME);
 		this.message.setText(sb.toString());
+		changeControlButtonsEnableState(false);
 	}
 
 	@Override
@@ -145,6 +151,7 @@ public class View extends JFrame implements Observer {
 	@Override
 	public void boardFull() {
 		this.message.setText(UiText.BOARD_FULL);
+		changeControlButtonsEnableState(false);
 	}
 
 	@Override
@@ -154,20 +161,26 @@ public class View extends JFrame implements Observer {
 				.append(winner)
 				.append(UiText.WINS_THE_GAME);
 		this.message.setText(sb.toString());
+		changeControlButtonsEnableState(false);
 	}
 
 	@Override
 	public void newGame(int columns, int rows) {
 		initBoard(rows, columns);
+		changeControlButtonsEnableState(true);
 	}
 
 	@Override
-	public void updateCell(int x, int y, CellType type, String playerTurn) {
+	public void updateCell(int x, int y, CellType type) {
 		ImageIcon lastPlayedIcon = icons[type.ordinal()];
 		setIcon(x, y, lastPlayedIcon);
-		if (!this.message.getText().equals("")) {
-			this.message.setText(UiText.YOUR_TURN + playerTurn + " !");
-		}
+	}
+
+	@Override
+	public void updatePlayerTurn(String playerTurn) {
+		//if (!this.message.getText().equals("")) {
+		this.message.setText(UiText.YOUR_TURN + playerTurn + " !");
+		//}
 	}
 
 
