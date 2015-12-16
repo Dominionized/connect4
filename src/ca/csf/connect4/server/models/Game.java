@@ -1,18 +1,16 @@
 package ca.csf.connect4.server.models;
 
 // Shared module dependencies
-import ca.csf.connect4.server.UpdateModel;
+import ca.csf.connect4.server.GameConfig;
 import ca.csf.connect4.shared.Observable;
 import ca.csf.connect4.shared.models.Cell;
 import ca.csf.connect4.shared.models.Cell.CellType;
 
 import ca.csf.connect4.shared.Observer;
-import ca.csf.connect4.server.ObserverHandler;
 import ca.csf.connect4.client.ui.UiText;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Created by dom on 25/09/15.
@@ -23,20 +21,22 @@ public class Game implements Observable {
     private static final String BLACK_PLAYER_NAME = "Black player";
     private static final String RED_PLAYER_NAME = "Red player";
 
+    private GameConfig config;
     private Board board;
-    private int tokenCountWin;
     private List<Observer> observers;
 
     private int playerTurn;
+    private volatile boolean gameOver;
 
-    public Game(int columns, int rows, int tokenCountWin) {
-        this.board = new Board(columns, rows);
-        this.tokenCountWin = tokenCountWin;
+    public Game(GameConfig config) {
+        this.config = config;
+        this.board = new Board(this.config.getColumns(), this.config.getRows());
         this.observers = new ArrayList<Observer>();
         this.playerTurn = 0;
     }
 
     public void dropToken(int columnIndex) throws Exception {
+        if (gameOver) return;
         CellType tokenToPlay;
         switch (playerTurn) {
             case 0:
@@ -57,16 +57,15 @@ public class Game implements Observable {
 
     private void update() {
         if (board.getLastChangedCellType() != CellType.EMPTY) {
-            UpdateModel updateModel = new UpdateModel(this.board.getLastChangedCellX(),
-                                                      this.board.getLastChangedCellY(),
-                                                      this.board.getLastChangedCellType());
-            this.observers.forEach((observer) ->);
-            this.observers.forEach((observer) -> observer.columnFull(column));
+            int x = this.board.getLastChangedCellX();
+            int y = this.board.getLastChangedCellY();
+            CellType cellType = this.board.getLastChangedCellType();
+            this.observers.forEach(observer -> observer.updateCell(x, y, cellType, playerNumberToColor(this.playerTurn)));
         }
     }
 
     public void executeVerifications() {
-        isStackFull();
+        isColumnFull();
         isBoardFull();
         isGameWon();
     }
@@ -75,53 +74,50 @@ public class Game implements Observable {
         int lastColumnChanged = this.board.getLastChangedCellX();
         int lastRowChanged = this.board.getLastChangedCellY();
         if (won(lastColumnChanged, lastRowChanged)) {
-            this.observers.forEach(ObserverHandler::gameOver, whoWins());
+            this.gameOver = true;
+            String winner = whoWins();
+            this.observers.forEach(observer -> observer.gameWon(winner));
+            newGame();
         }
     }
 
-    private void isStackFull() {
+    private void isColumnFull() {
         for (int column : board.getFilledColumns()) {
             if (column == board.getLastChangedCellX()) {
-                this.observers.forEach(ObserverHandler::columnFull, column);
+                this.observers.forEach(observer -> observer.columnFull(column));
             }
         }
     }
 
     private void isBoardFull() {
         if (board.isFull()) {
-            this.observers.forEach(ObserverHandler::boardFull, null);
+            this.observers.forEach(observer -> observer.boardFull());
+            newGame();
         }
     }
 
     public void resign() {
-        this.observers.forEach(ObserverHandler::gameResigned, whoWins());
+        if (gameOver) return;
+        String winner = whoWins();
+        this.observers.forEach(observer -> observer.gameResigned(winner));
+        newGame();
     }
 
-    public Cell[][] getBoardArray() {
-        return board.getCellArray();
+    private void newGame() {
+        int columns = this.config.getColumns();
+        int rows = this.config.getRows();
+        this.board = new Board(columns, rows);
+        this.gameOver = false;
+        this.observers.forEach(observer -> observer.newGame(columns, rows));
     }
 
-    public int getSizeX() {
-        return board.getSizeX();
+    private boolean won(int column, int row) {
+        return board.checkAround(column, row, this.config.getTokenCountWin());
     }
-
-    public int getSizeY() {
-        return board.getSizeY();
-    }
-
-    public boolean won(int column, int row) {
-        return board.checkAround(column, row, tokenCountWin);
-    }
-
     private String whoWins() {
         return (board.getLastChangedCellType() == CellType.BLACK) ? BLACK_PLAYER_NAME : RED_PLAYER_NAME;
     }
-
-    public int getPlayerTurn() {
-        return playerTurn;
-    }
-
-    public String playerNumberToColor(int playerNumber) {
+    private String playerNumberToColor(int playerNumber) {
         switch(playerNumber) {
             case 0:
                 return UiText.RED;
@@ -129,10 +125,6 @@ public class Game implements Observable {
                 return UiText.BLACK;
         }
         return "";
-    }
-
-    public void setTokenCountWin(int tokenCountWin) {
-        this.tokenCountWin = tokenCountWin;
     }
 
     @Override

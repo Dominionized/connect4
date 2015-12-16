@@ -1,12 +1,12 @@
 package ca.csf.connect4.server;
 
+import ca.csf.connect4.server.models.Game;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.IllegalFormatException;
 import java.util.stream.Stream;
 
 /**
@@ -21,7 +21,7 @@ public class ServerLauncher {
 
 
     public ServerLauncher(String[] args) throws IOException {
-        displayLogo();
+        //displayLogo();
         if (args.length == 0) {
             exec();
         }
@@ -44,15 +44,12 @@ public class ServerLauncher {
     }
 
     private void exec(int rows, int columns, int tokens) throws IOException {
-        ServerConfig config = new ServerConfig(rows, columns, tokens);
+        GameConfig config = new GameConfig(rows, columns, tokens);
         new ServerController(config);
     }
 
     private void exec() throws IOException {
-        ServerConfig config = new ServerConfig(ServerConfig.DEFAULT_ROW_COUNT,
-                                        ServerConfig.DEFAULT_COLUMN_COUNT,
-                                        ServerConfig.DEFAULT_NB_CELLS_TO_WIN);
-        new ServerController(config);
+        exec(GameConfig.DEFAULT_COLUMN_COUNT, GameConfig.DEFAULT_ROW_COUNT, GameConfig.DEFAULT_NB_CELLS_TO_WIN);
     }
 
     private boolean tryParseInt(String value) {

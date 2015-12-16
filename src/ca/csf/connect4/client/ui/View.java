@@ -1,8 +1,12 @@
 package ca.csf.connect4.client.ui;
 
+//
 import ca.csf.connect4.shared.Observer;
+
+import ca.csf.connect4.server.models.Game;
+
 import ca.csf.connect4.client.ClientController;
-import ca.csf.connect4.server.models.Cell;
+import ca.csf.connect4.shared.models.Cell.CellType;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -11,25 +15,29 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class View extends JFrame implements Observer {
 	private static final long serialVersionUID = 1L;
 
+	private static final String iconsPath = "/resources/";
+	private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
+
+	private ClientController controller;
+	private ImageIcon[] icons;
+
     private final JTextField message = new JTextField(20);
     private final JPanel centerPane = new JPanel();
-
-    private ClientController controller;
     private JButton[] controlButtons;
     private MyImageContainer[][] placeHolders;
 
-	public View(ClientController controller)
-	{
-        this.controller = controller;
+	public View(ClientController controller) {
+		this.controller = controller;
 
 		this.setTitle("Connect4");
-
 		this.configureWindow();
 
 		this.setLayout(new BorderLayout());
@@ -43,8 +51,7 @@ public class View extends JFrame implements Observer {
 		this.setVisible(true);
 	}
 
-	private void createMenu()
-	{
+	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu gameMenu = new JMenu(UiText.GAME);
 		JMenuItem resignMenuItem = new JMenuItem(UiText.RESIGN);
@@ -61,8 +68,7 @@ public class View extends JFrame implements Observer {
 		this.setJMenuBar(menuBar);
 	}
 
-	private void configureWindow()
-	{
+	private void configureWindow() {
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension screenSize = toolkit.getScreenSize();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,15 +76,25 @@ public class View extends JFrame implements Observer {
 		setLocation(((screenSize.width - getWidth()) / 2), ((screenSize.height - getHeight()) / 2));
 	}
 
-    public void initBoard(int nbRows, int nbColumns) {
+	private void initIcons() throws IOException {
+		int numberPlayers = Game.DEFAULT_NB_PLAYERS;
+		icons = new ImageIcon[numberPlayers];
+		StringBuilder pathBuilder = new StringBuilder();
+		for (int i = 0; i < numberPlayers; ++i) {
+			String path = pathBuilder.append(iconsPath).append(iconsName[i]).toString();
+			icons[i] = new ImageIcon(ImageIO.read(getClass().getResourceAsStream(path)));
+			pathBuilder.delete(0, pathBuilder.length());
+		}
+	}
+
+    public void initBoard(int rows, int columns) {
         this.centerPane.removeAll();
-        this.placeHolders = new MyImageContainer[nbColumns][nbRows];
-        this.controlButtons = new JButton[nbColumns];
+        this.placeHolders = new MyImageContainer[columns][rows];
+        this.controlButtons = new JButton[columns];
 
-        centerPane.setLayout(new GridLayout(nbRows + 1, nbColumns));
+        centerPane.setLayout(new GridLayout(rows + 1, columns));
 
-        for (int i = 0; i < nbColumns; i++)
-        {
+        for (int i = 0; i < columns; i++) {
             JButton button = new JButton(Integer.toString(i));
             this.controlButtons[i] = button;
             button.addActionListener(new ButtonHandler(i));
@@ -86,10 +102,8 @@ public class View extends JFrame implements Observer {
         }
 
         //for (int row = nbRows - 1; row >= 0; row--)
-        for (int row = 0; row < nbRows; row++)
-        {
-            for (int column = 0; column < nbColumns; column++)
-            {
+        for (int row = 0; row < rows; row++) {
+            for (int column = 0; column < columns; column++) {
                 MyImageContainer button = new MyImageContainer();
                 button.setOpaque(true);
                 placeHolders[column][row] = button;
@@ -115,32 +129,49 @@ public class View extends JFrame implements Observer {
     }
 
 	@Override
-	public void updateCell(int x, int y, Cell.CellType type) {
-
-	}
-
-	@Override
 	public void gameWon(String winner) {
-
+		StringBuilder sb = new StringBuilder();
+		sb.append(UiText.GAME_OVER)
+				.append(winner)
+				.append(UiText.WINS_THE_GAME);
+		this.message.setText(sb.toString());
 	}
 
 	@Override
 	public void columnFull(int x) {
-
+		disableControlButton(x);
 	}
 
 	@Override
 	public void boardFull() {
-
+		this.message.setText(UiText.BOARD_FULL);
 	}
 
 	@Override
 	public void gameResigned(String winner) {
-
+		StringBuilder sb = new StringBuilder();
+		sb.append(UiText.GAME_RESIGNED)
+				.append(winner)
+				.append(UiText.WINS_THE_GAME);
+		this.message.setText(sb.toString());
 	}
 
-	private class ButtonHandler implements ActionListener
-	{
+	@Override
+	public void newGame(int columns, int rows) {
+		initBoard(rows, columns);
+	}
+
+	@Override
+	public void updateCell(int x, int y, CellType type, String playerTurn) {
+		ImageIcon lastPlayedIcon = icons[type.ordinal()];
+		setIcon(x, y, lastPlayedIcon);
+		if (!this.message.getText().equals("")) {
+			this.message.setText(UiText.YOUR_TURN + playerTurn + " !");
+		}
+	}
+
+
+	private class ButtonHandler implements ActionListener {
         private final int columnIndex;
 
 		private ButtonHandler(int columnIndex)
@@ -155,8 +186,7 @@ public class View extends JFrame implements Observer {
             controller.dropToken(columnIndex);
 		}
     }
-	private class ResignActionHandler implements ActionListener
-	{
+	private class ResignActionHandler implements ActionListener {
         @Override
 		public void actionPerformed(ActionEvent arg0)
 		{
@@ -164,8 +194,7 @@ public class View extends JFrame implements Observer {
 			controller.resign();
 		}
     }
-	private class AboutActionHandler implements ActionListener
-	{
+	private class AboutActionHandler implements ActionListener {
         @Override
 		public void actionPerformed(ActionEvent arg0)
 		{

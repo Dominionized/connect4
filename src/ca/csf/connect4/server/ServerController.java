@@ -2,6 +2,7 @@ package ca.csf.connect4.server;
 
 // Shared module dependencies
 import ca.csf.connect4.shared.Connect4Server;
+import ca.csf.connect4.shared.NetworkConfig;
 import ca.csf.connect4.shared.models.Cell;
 
 import ca.csf.connect4.server.models.Game;
@@ -30,18 +31,22 @@ public class ServerController extends Server implements Connect4Server {
         }
     }
 
+    public static final long DEFAULT_POLL_INTERVAL_MS = 500;
+
     private CallHandler handler;
-    private ServerConfig config;
+    private GameConfig config;
     private Game game;
 
-    public ServerController(ServerConfig config) throws IOException {
+    public ServerController(GameConfig config) throws IOException {
         this.config = config;
+        this.handler = new CallHandler();
         try {
             this.handler.registerGlobal(Connect4Server.class, this);
-            this.bind(ServerConfig.DEFAULT_LISTEN_PORT, handler);
+            this.bind(NetworkConfig.DEFAULT_LISTEN_PORT, handler);
             this.addServerListener(new ServerListener());
+            System.out.println("Server is listening on port " + NetworkConfig.DEFAULT_LISTEN_PORT);
             while (true) {
-                Thread.sleep(ServerConfig.DEFAULT_POLL_INTERVAL_MS);
+                Thread.sleep(DEFAULT_POLL_INTERVAL_MS);
             }
         } catch (LipeRMIException e) {
             e.printStackTrace();
@@ -51,6 +56,7 @@ public class ServerController extends Server implements Connect4Server {
 
     }
 
+    @Override
     public void dropToken(int pos) {
         try {
             game.dropToken(pos);
@@ -58,8 +64,6 @@ public class ServerController extends Server implements Connect4Server {
             e.printStackTrace();
         }
     }
-
-
 
     // Notify all observers of winner.
     public void resign() {
@@ -70,10 +74,7 @@ public class ServerController extends Server implements Connect4Server {
     // Have the client reset his UI.
     // Have the server reset the model.
     private void restartGame() {
-        this.game = new Game(this.config.getColumns(),
-                             this.config.getRows(),
-                             this.config.getTokenCountWin());
-        this.
+        this.game = new Game(this.config);
 //        game = new Game(this.config.getColumns(), this.config.getColumns());
 //        game.registerObserver(this);
 //        game.setTokenCountWin(nbCellsToWin);
@@ -81,43 +82,4 @@ public class ServerController extends Server implements Connect4Server {
 //        view.enableAllControlButtons();
     }
 
-    @Override
-    public void updateCell(int x, int y, Cell.CellType type) {
-        ImageIcon lastPlayedIcon = icons[type.ordinal()];
-        view.setIcon(x, y, lastPlayedIcon);
-        if (!view.getMessage().getText().equals("")) {
-            view.getMessage().setText(UiText.YOUR_TURN + game.playerNumberToColor(game.getPlayerTurn()) + " !");
-        }
-    }
-
-    @Override
-    public void gameWon(String winner) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(UiText.GAME_OVER)
-                .append(winner)
-                .append(UiText.WINS_THE_GAME);
-        view.getMessage().setText(sb.toString());
-        restartGame();
-    }
-
-    @Override
-    public void stackFull(int x) {
-        view.disableControlButton(x);
-    }
-
-    @Override
-    public void boardFull() {
-        view.getMessage().setText(UiText.BOARD_FULL);
-        restartGame();
-    }
-
-    @Override
-    public void gameResigned(String winner) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(UiText.GAME_RESIGNED)
-                .append(winner)
-                .append(UiText.WINS_THE_GAME);
-        view.getMessage().setText(sb.toString());
-        restartGame();
-    }
 }
