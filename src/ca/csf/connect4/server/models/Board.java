@@ -1,7 +1,6 @@
 package ca.csf.connect4.server.models;
 // Shared module dependencies
 import ca.csf.connect4.shared.models.Cell;
-import ca.csf.connect4.shared.models.Cell.CellType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ public class Board {
     private List<Integer> filledStacks;
 
     private Cell[][] cellArray;
-    private CellType lastChangedCellType;
+    private Cell lastChangedCellType;
     private int lastChangedCellX;
     private int lastChangedCellY;
 
@@ -58,14 +57,14 @@ public class Board {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.filledStacks = new ArrayList<Integer>();
-        this.lastChangedCellType = CellType.EMPTY;
+        this.lastChangedCellType = Cell.EMPTY;
         initializeCells();
     }
 
     private void initializeCells() {
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
-                cellArray[i][j] = new Cell(Cell.CellType.EMPTY);
+                cellArray[i][j] = Cell.EMPTY;
             }
         }
     }
@@ -74,19 +73,19 @@ public class Board {
         return cellArray;
     }
 
-    public void dropToken(int posX, CellType cellType) throws Exception {
-        if (cellArray[posX][0].cellType != Cell.CellType.EMPTY) {
+    public void dropToken(int posX, Cell cellType) throws Exception {
+        if (cellArray[posX][0] != Cell.EMPTY) {
             throw new Exception("Stack full");
         }
 
-        if (cellArray[posX][1].cellType != Cell.CellType.EMPTY) {
+        if (cellArray[posX][1] != Cell.EMPTY) {
             filledStacks.add(posX); // Stack is filled. You can no longer add items to it.
         }
 
         for (int i = 0; i < sizeY; i++) {
-            if (!inBounds(posX, i + 1) || (cellArray[posX][i + 1].cellType != Cell.CellType.EMPTY)) {
-                cellArray[posX][i].cellType = cellType;
-                lastChangedCellType = cellArray[posX][i].cellType;
+            if (!inBounds(posX, i + 1) || (cellArray[posX][i + 1] != Cell.EMPTY)) {
+                cellArray[posX][i] = cellType;
+                lastChangedCellType = cellArray[posX][i];
                 lastChangedCellX = posX;
                 lastChangedCellY = i;
                 return;
@@ -104,7 +103,7 @@ public class Board {
     public boolean isFull() {
         for (Cell[] row : cellArray) {
             for (Cell cell : row) {
-                if (cell.cellType == CellType.EMPTY) return false;
+                if (cell == Cell.EMPTY) return false;
             }
         }
         return true;
@@ -114,7 +113,7 @@ public class Board {
         int nextX = x + dir.relativePosX;
         int nextY = y + dir.relativePosY;
 
-        if (inBounds(nextX, nextY) && (cellArray[nextX][nextY].cellType == cellArray[x][y].cellType)) {
+        if (inBounds(nextX, nextY) && (cellArray[nextX][nextY] == cellArray[x][y])) {
             return 1 + numberOfConnectedCells(nextX, nextY, dir);
         }
         else {
@@ -129,7 +128,7 @@ public class Board {
     public void debugCellArray() {
         for (int j = 0; j < sizeY; j++) {
             for (int i = 0; i < sizeX; i++) {
-                switch(cellArray[i][j].cellType) {
+                switch(cellArray[i][j]) {
                     case BLACK:
                         System.out.print("B");
                         break;
@@ -147,7 +146,7 @@ public class Board {
         System.out.println();
     }
 
-    public CellType getLastChangedCellType() {
+    public Cell getLastChangedCellType() {
         return lastChangedCellType;
     }
 

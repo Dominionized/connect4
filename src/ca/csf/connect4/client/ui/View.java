@@ -7,15 +7,14 @@ import ca.csf.connect4.shared.Observer;
 import ca.csf.connect4.server.models.Game;
 
 import ca.csf.connect4.client.ClientController;
-import ca.csf.connect4.shared.models.Cell.CellType;
+import ca.csf.connect4.shared.models.Cell;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -63,8 +62,11 @@ public class View extends JFrame implements Observer, Serializable {
 		this.createMenu();
 		GameConfig config = this.controller.getConfig();
 		System.out.println("C: " + config.getColumns() + " R: " + config.getRows());
+        this.observerId = this.controller.registerObserver(this);
+        this.addWindowListener(new WindowHandler(this, this.controller));
 		initBoard(config.getRows(), config.getColumns());
 		this.setVisible(true);
+
 	}
 
 	private void createMenu() {
@@ -179,19 +181,24 @@ public class View extends JFrame implements Observer, Serializable {
 	}
 
 	@Override
-	public void setObserverId(int id) {
-		observerId = id;
-	}
-
-	@Override
 	public int getObserverId() {
 		return observerId;
 	}
 
 	@Override
-	public void updateCell(int x, int y, CellType type) {
+	public void updateCell(int x, int y, Cell type) {
 		ImageIcon lastPlayedIcon = icons[type.ordinal()];
 		setIcon(x, y, lastPlayedIcon);
+	}
+
+	@Override
+	public void setGrid(Cell[][] types) {
+        GameConfig config = this.controller.getConfig();
+        for (int i = 0; i < config.getRows(); i++ ) {
+            for (int j = 0; j < config.getColumns(); i++) {
+                this.updateCell(i, j, types[i][j]);
+            }
+        }
 	}
 
 	@Override
@@ -201,6 +208,22 @@ public class View extends JFrame implements Observer, Serializable {
 		//}
 	}
 
+    private class WindowHandler extends WindowAdapter {
+
+        private View view;
+        private ClientController controller;
+
+        public WindowHandler(View view, ClientController controller) {
+            this.view = view;
+            this.controller = controller;
+        }
+
+        @Override
+        public void windowClosing(WindowEvent windowEvent) {
+            this.controller.unregisterObserver(view.observerId);
+            super.windowClosing(windowEvent);
+        }
+    }
 
 	private class ButtonHandler implements ActionListener {
         private final int columnIndex;

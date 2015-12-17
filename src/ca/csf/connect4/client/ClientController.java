@@ -6,6 +6,7 @@ import ca.csf.connect4.server.models.Game;
 import ca.csf.connect4.shared.Connect4Server;
 import ca.csf.connect4.shared.GameConfig;
 import ca.csf.connect4.shared.NetworkConfig;
+import ca.csf.connect4.shared.Observer;
 import ca.csf.connect4.shared.models.Cell;
 import net.sf.lipermi.handler.CallHandler;
 import net.sf.lipermi.net.Client;
@@ -36,6 +37,7 @@ public class ClientController {
     private CallHandler handler;
     private Client client;
     private Connect4Server server;
+    private int observerId;
 
     public ClientController(String hostname) {
 
@@ -48,7 +50,6 @@ public class ClientController {
             this.server = client.getGlobal(Connect4Server.class);
             this.gameConfig = getConfig();
             this.view = new View(this);
-            this.server.registerObserver(this.view);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
                     UiText.Errors.CONNECTION_TO_SERVER_FAILED,
@@ -70,5 +71,12 @@ public class ClientController {
         this.server.resign();
     }
 
+    public int registerObserver(Observer observer) {
+        return this.server.registerObserver(observer);
+    }
+
+    public void unregisterObserver(int id) {
+        this.server.unregisterObserver(id);
+    }
 
 }
