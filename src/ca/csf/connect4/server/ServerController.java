@@ -20,16 +20,9 @@ public class ServerController extends Server implements Connect4Server {
 
     private class ServerListener implements IServerListener {
 
-        private ServerController controller;
-
-        public ServerListener(ServerController controller) {
-
-        }
-
         @Override
         public void clientConnected(Socket socket) {
             System.out.format("[%s] : Client connected from %s%n", LocalDateTime.now().toString(), socket.getInetAddress().toString());
-            this.controller.getGame().
         }
 
         @Override
@@ -52,7 +45,7 @@ public class ServerController extends Server implements Connect4Server {
         try {
             this.handler.registerGlobal(Connect4Server.class, this);
             this.bind(NetworkConfig.DEFAULT_LISTEN_PORT, handler);
-            this.serverListener = new ServerListener(this);
+            this.serverListener = new ServerListener();
             this.addServerListener(this.serverListener);
             System.out.println("Server is listening on port " + NetworkConfig.DEFAULT_LISTEN_PORT);
             while (true) {
@@ -86,13 +79,17 @@ public class ServerController extends Server implements Connect4Server {
     }
 
     @Override
-    public void connect(Observer observer) {
-        this.serverListener.
+    public int registerObserver(Observer observer) {
+        return this.game.registerObserver(observer);
     }
 
     @Override
-    public void disconnect() {
-
+    public void unregisterObserver(int id) {
+        try {
+            this.game.unregisterObserver(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Split this method.

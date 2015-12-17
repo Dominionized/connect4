@@ -14,4 +14,5 @@ public interface Observer {
     void gameResigned(String winner);
     void newGame(int columns, int rows);
     void setObserverId(int id);
+    int getObserverId();
 }

@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * Created by dom on 14/12/15.
  */
-public class ClientController implements Connect4Server {
+public class ClientController {
 
     private class ClientListener implements IClientListener {
         @Override
@@ -37,23 +37,18 @@ public class ClientController implements Connect4Server {
     private Client client;
     private Connect4Server server;
 
-    private int observerId;
-
-    @Override
-    public void setObserverId(int id) {
-        this.observerId = id;
-    }
-
     public ClientController(String hostname) {
+
         this.hostname = hostname;
-        this.view = new View(this);
         this.handler = new CallHandler();
+
         try {
             this.client = new Client(this.hostname, NetworkConfig.DEFAULT_LISTEN_PORT, this.handler);
             this.client.addClientListener(new ClientListener());
             this.server = client.getGlobal(Connect4Server.class);
-            this.server.
             this.gameConfig = getConfig();
+            this.view = new View(this);
+            this.server.registerObserver(this.view);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
                     UiText.Errors.CONNECTION_TO_SERVER_FAILED,
@@ -61,20 +56,16 @@ public class ClientController implements Connect4Server {
                     JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
-
     }
 
-    @Override
     public GameConfig getConfig() {
         return this.server.getConfig();
     }
 
-    @Override
     public void dropToken(int column) {
         this.server.dropToken(column);
     }
 
-    @Override
     public void resign() {
         this.server.resign();
     }

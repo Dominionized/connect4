@@ -1,6 +1,7 @@
 package ca.csf.connect4.client.ui;
 
 //
+import ca.csf.connect4.shared.GameConfig;
 import ca.csf.connect4.shared.Observer;
 
 import ca.csf.connect4.server.models.Game;
@@ -16,12 +17,14 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class View extends JFrame implements Observer {
-	private static final long serialVersionUID = 1L;
+public class View extends JFrame implements Observer, Serializable {
+
+	private static final long serialVersionUID = 8041240122289932532L;
 
 	private static final String iconsPath = "/resources/";
 	private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
@@ -33,6 +36,8 @@ public class View extends JFrame implements Observer {
     private final JPanel centerPane = new JPanel();
     private JButton[] controlButtons;
     private MyImageContainer[][] placeHolders;
+
+	private int observerId;
 
 	public View(ClientController controller) {
 		try {
@@ -56,6 +61,9 @@ public class View extends JFrame implements Observer {
 		this.message.setText(UiText.WELCOME);
 		this.add(panelNorth, BorderLayout.NORTH);
 		this.createMenu();
+		GameConfig config = this.controller.getConfig();
+		System.out.println("C: " + config.getColumns() + " R: " + config.getRows());
+		initBoard(config.getRows(), config.getColumns());
 		this.setVisible(true);
 	}
 
@@ -103,7 +111,7 @@ public class View extends JFrame implements Observer {
         centerPane.setLayout(new GridLayout(rows + 1, columns));
 
         for (int i = 0; i < columns; i++) {
-            JButton button = new JButton(Integer.toString(i));
+            JButton button = new JButton("" + i);
             this.controlButtons[i] = button;
             button.addActionListener(new ButtonHandler(i));
             centerPane.add(button);
@@ -168,6 +176,16 @@ public class View extends JFrame implements Observer {
 	public void newGame(int columns, int rows) {
 		initBoard(rows, columns);
 		changeControlButtonsEnableState(true);
+	}
+
+	@Override
+	public void setObserverId(int id) {
+		observerId = id;
+	}
+
+	@Override
+	public int getObserverId() {
+		return observerId;
 	}
 
 	@Override

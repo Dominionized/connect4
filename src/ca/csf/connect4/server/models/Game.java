@@ -9,10 +9,9 @@ import ca.csf.connect4.shared.models.Cell.CellType;
 import ca.csf.connect4.shared.Observer;
 import ca.csf.connect4.client.ui.UiText;
 
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Created by dom on 25/09/15.
@@ -25,16 +24,19 @@ public class Game implements Observable {
 
     private GameConfig config;
     private Board board;
-    private HashMap<Socket, Observer> observers;
+    private HashMap<Integer, Observer> observers;
 
     private int playerTurn;
     private volatile boolean gameOver;
+    private Random random;
 
     public Game(GameConfig config) {
         this.config = config;
         this.board = new Board(this.config.getColumns(), this.config.getRows());
-        this.observers = new HashMap<Socket, Observer>();
+        this.observers = new HashMap<Integer, Observer>();
         this.playerTurn = 0;
+        this.gameOver = false;
+        this.random = new Random(System.currentTimeMillis());
     }
 
     public void dropToken(int columnIndex) throws Exception {
@@ -58,8 +60,8 @@ public class Game implements Observable {
     }
 
     public void disconnect(Observer disconnectedObserver) {
-        unregisterObserver(disconnectedObserver);
-        this.observers.forEach(observer -> observer.gameResigned(whoWins()));
+        //unregisterObserver(disconnectedObserver);
+        this.observers.forEach((id, observer) -> observer.gameResigned(whoWins()));
     }
 
     private void update() {
@@ -67,7 +69,7 @@ public class Game implements Observable {
             int x = this.board.getLastChangedCellX();
             int y = this.board.getLastChangedCellY();
             CellType cellType = this.board.getLastChangedCellType();
-            this.observers.forEach(observer -> observer.updateCell(x, y, cellType));
+            this.observers.forEach((id, observer) -> observer.updateCell(x, y, cellType));
         }
     }
 
@@ -83,7 +85,7 @@ public class Game implements Observable {
         if (won(lastColumnChanged, lastRowChanged)) {
             this.gameOver = true;
             String winner = whoWins();
-            this.observers.forEach(observer -> observer.gameWon(winner));
+            this.observers.forEach((id, observer) -> observer.gameWon(winner));
             newGame();
         }
     }
@@ -91,14 +93,14 @@ public class Game implements Observable {
     private void isColumnFull() {
         for (int column : board.getFilledColumns()) {
             if (column == board.getLastChangedCellX()) {
-                this.observers.forEach(observer -> observer.columnFull(column));
+                this.observers.forEach((id, observer) -> observer.columnFull(column));
             }
         }
     }
 
     private void isBoardFull() {
         if (board.isFull()) {
-            this.observers.forEach(observer -> observer.boardFull());
+            this.observers.forEach((id, observer) -> observer.boardFull());
             newGame();
         }
     }
@@ -106,7 +108,7 @@ public class Game implements Observable {
     public void resign() {
         if (gameOver) return;
         String winner = whoWins();
-        this.observers.forEach(observer -> observer.gameResigned(winner));
+        this.observers.forEach((id, observer) -> observer.gameResigned(winner));
         newGame();
     }
 
@@ -115,7 +117,7 @@ public class Game implements Observable {
         int rows = this.config.getRows();
         this.board = new Board(columns, rows);
         this.gameOver = false;
-        this.observers.forEach(observer -> observer.newGame(columns, rows));
+        this.observers.forEach((id, observer) -> observer.newGame(columns, rows));
     }
 
     private boolean won(int column, int row) {
@@ -134,15 +136,27 @@ public class Game implements Observable {
         return "";
     }
 
-    @Overridee
-    public void registerObserver(Observer observer) {
-        this.observers.add(observer);
+    @Override
+    public int registerObserver(Observer observer) {
+        int randomID = getRand();
+        while (!isIDUnique(randomID))
+            randomID = getRand();
+        this.observers.put(randomID, observer);
+        return randomID;
+    }
+
+    private boolean isIDUnique(int randomID) {
+        if (this.observers.containsKey(randomID)) return false;
+        return true;
+    }
+
+    private int getRand() {
+        return random.nextInt();
     }
 
     @Override
-    public void unregisterObserver(Observer observer) throws Exception {
-        if (!observers.remove(observer))
+    public void unregisterObserver(int id) throws Exception {
+        if (observers.remove(id) == null)
             throw new Exception("Observer not found");
     }
-
 }

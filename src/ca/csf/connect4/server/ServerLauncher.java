@@ -31,7 +31,7 @@ public class ServerLauncher {
         int rows = Integer.parseInt(args[0]);
         int columns = Integer.parseInt(args[1]);
         int tokens = Integer.parseInt(args[2]);
-        exec(rows, columns, tokens);
+        exec(columns, rows, tokens);
     }
 
     private void displayLogo() {
@@ -43,8 +43,8 @@ public class ServerLauncher {
         }
     }
 
-    private void exec(int rows, int columns, int tokens) throws IOException {
-        GameConfig config = new GameConfig(rows, columns, tokens);
+    private void exec(int columns, int rows, int tokens) throws IOException {
+        GameConfig config = new GameConfig(columns, rows, tokens);
         new ServerController(config);
     }
 
