@@ -1,6 +1,5 @@
 package ca.csf.connect4.client.ui;
 
-//
 import ca.csf.connect4.shared.GameConfig;
 import ca.csf.connect4.shared.Observer;
 
@@ -23,29 +22,28 @@ import javax.swing.*;
 
 public class View extends JFrame implements Observer, Serializable {
 
-	private static final long serialVersionUID = 8041240122289932532L;
-
+	private static final long serialVersionUID = 5185109962736774530L;
 	private static final String iconsPath = "/resources/";
 	private static final String[] iconsName = { "RedToken.png", "BlackToken.png" };
 
 	private ClientController controller;
 	private ImageIcon[] icons;
+	private int observerId;
 
+    private JMenuItem resignMenuItem;
     private final JTextField message = new JTextField(20);
     private final JPanel centerPane = new JPanel();
     private JButton[] controlButtons;
     private MyImageContainer[][] placeHolders;
-
-	private int observerId;
 
 	public View(ClientController controller) {
 		try {
 			initIcons();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, UiText.Errors.LOAD_RESOURCES_FAILED,
-					UiText.Errors.ERROR_OCCURED,
+					UiText.Errors.ERROR,
 					JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
+			System.exit(0);
 		}
 		this.controller = controller;
 
@@ -61,10 +59,9 @@ public class View extends JFrame implements Observer, Serializable {
 		this.add(panelNorth, BorderLayout.NORTH);
 		this.createMenu();
 		GameConfig config = this.controller.getConfig();
-		System.out.println("C: " + config.getColumns() + " R: " + config.getRows());
-        this.observerId = this.controller.registerObserver(this);
         this.addWindowListener(new WindowHandler(this, this.controller));
 		initBoard(config.getRows(), config.getColumns());
+        this.observerId = this.controller.registerObserver(this);
 		this.setVisible(true);
 
 	}
@@ -72,8 +69,8 @@ public class View extends JFrame implements Observer, Serializable {
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu gameMenu = new JMenu(UiText.GAME);
-		JMenuItem resignMenuItem = new JMenuItem(UiText.RESIGN);
-		resignMenuItem.addActionListener(new ResignActionHandler());
+		this.resignMenuItem = new JMenuItem(UiText.RESIGN);
+		this.resignMenuItem.addActionListener(new ResignActionHandler());
 		gameMenu.add(resignMenuItem);
 		menuBar.add(gameMenu);
 
@@ -85,7 +82,6 @@ public class View extends JFrame implements Observer, Serializable {
 
 		this.setJMenuBar(menuBar);
 	}
-
 	private void configureWindow() {
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension screenSize = toolkit.getScreenSize();
@@ -93,7 +89,6 @@ public class View extends JFrame implements Observer, Serializable {
 		setSize(((screenSize.width * 3) / 6), ((screenSize.height * 4) / 7));
 		setLocation(((screenSize.width - getWidth()) / 2), ((screenSize.height - getHeight()) / 2));
 	}
-
 	private void initIcons() throws IOException {
 		int numberPlayers = Game.DEFAULT_NB_PLAYERS;
 		icons = new ImageIcon[numberPlayers];
@@ -175,37 +170,39 @@ public class View extends JFrame implements Observer, Serializable {
 	}
 
 	@Override
-	public void newGame(int columns, int rows) {
+	public void resetGame(int columns, int rows) {
 		initBoard(rows, columns);
-		changeControlButtonsEnableState(true);
+		changeControlButtonsEnableState(false);
 	}
 
-	@Override
-	public int getObserverId() {
-		return observerId;
-	}
+    @Override
+    public void setUIEnabled(boolean enabled) {
+        changeControlButtonsEnableState(enabled);
+        this.resignMenuItem.setEnabled(enabled);
+    }
 
-	@Override
-	public void updateCell(int x, int y, Cell type) {
-		ImageIcon lastPlayedIcon = icons[type.ordinal()];
+    @Override
+	public void updateCell(int x, int y, Cell cell) {
+        if (cell == Cell.EMPTY) return;
+		ImageIcon lastPlayedIcon = icons[cell.ordinal()];
 		setIcon(x, y, lastPlayedIcon);
 	}
 
 	@Override
-	public void setGrid(Cell[][] types) {
+	public void setGrid(Cell[][] cells) {
         GameConfig config = this.controller.getConfig();
-        for (int i = 0; i < config.getRows(); i++ ) {
-            for (int j = 0; j < config.getColumns(); i++) {
-                this.updateCell(i, j, types[i][j]);
+        int columns = config.getColumns();
+        int rows = config.getRows();
+        for (int i = 0; i < columns; i++ ) {
+            for (int j = 0; j < rows; j++) {
+                this.updateCell(i, j, cells[i][j]);
             }
         }
 	}
 
 	@Override
 	public void updatePlayerTurn(String playerTurn) {
-		//if (!this.message.getText().equals("")) {
-		this.message.setText(UiText.YOUR_TURN + playerTurn + " !");
-		//}
+		this.message.setText(UiText.YOUR_TURN + playerTurn + UiText.YOUR_TURN_END);
 	}
 
     private class WindowHandler extends WindowAdapter {
@@ -224,7 +221,6 @@ public class View extends JFrame implements Observer, Serializable {
             super.windowClosing(windowEvent);
         }
     }
-
 	private class ButtonHandler implements ActionListener {
         private final int columnIndex;
 

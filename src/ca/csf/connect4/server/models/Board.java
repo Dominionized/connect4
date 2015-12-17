@@ -61,18 +61,9 @@ public class Board {
         initializeCells();
     }
 
-    private void initializeCells() {
-        for (int i = 0; i < sizeX; i++) {
-            for (int j = 0; j < sizeY; j++) {
-                cellArray[i][j] = Cell.EMPTY;
-            }
-        }
-    }
-
     public Cell[][] getCellArray() {
         return cellArray;
     }
-
     public void dropToken(int posX, Cell cellType) throws Exception {
         if (cellArray[posX][0] != Cell.EMPTY) {
             throw new Exception("Stack full");
@@ -92,14 +83,12 @@ public class Board {
             }
         }
     }
-
     public boolean checkAround(int x, int y, int numberOfConnectedCells) {
         for (Direction dir : Direction.values()) {
             if ((numberOfConnectedCells(x, y, dir) + numberOfConnectedCells(x, y, dir.getReverse())) - 1 >= numberOfConnectedCells) return true;
         }
         return false;
     }
-
     public boolean isFull() {
         for (Cell[] row : cellArray) {
             for (Cell cell : row) {
@@ -109,6 +98,26 @@ public class Board {
         return true;
     }
 
+    public Cell getLastChangedCellType() {
+        return lastChangedCellType;
+    }
+    public int getLastChangedCellX() {
+        return lastChangedCellX;
+    }
+    public int getLastChangedCellY() {
+        return lastChangedCellY;
+    }
+    public List<Integer> getFilledColumns() {
+        return filledStacks;
+    }
+
+    private void initializeCells() {
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+                cellArray[i][j] = Cell.EMPTY;
+            }
+        }
+    }
     private int numberOfConnectedCells(int x, int y, Direction dir) {
         int nextX = x + dir.relativePosX;
         int nextY = y + dir.relativePosY;
@@ -120,54 +129,7 @@ public class Board {
             return 1;
         }
     }
-
     private boolean inBounds(int x, int y) {
         return (x >= 0 && y >= 0 && x < sizeX && y < sizeY);
     }
-
-    public void debugCellArray() {
-        for (int j = 0; j < sizeY; j++) {
-            for (int i = 0; i < sizeX; i++) {
-                switch(cellArray[i][j]) {
-                    case BLACK:
-                        System.out.print("B");
-                        break;
-                    case RED:
-                        System.out.print("R");
-                        break;
-                    case EMPTY:
-                        System.out.print(".");
-                        break;
-                }
-                System.out.print(Integer.toString(i)+Integer.toString(j));
-            }
-            System.out.print("\n");
-        }
-        System.out.println();
-    }
-
-    public Cell getLastChangedCellType() {
-        return lastChangedCellType;
-    }
-
-    public int getLastChangedCellX() {
-        return lastChangedCellX;
-    }
-
-    public int getLastChangedCellY() {
-        return lastChangedCellY;
-    }
-
-    public int getSizeX() {
-        return sizeX;
-    }
-
-    public int getSizeY() {
-        return sizeY;
-    }
-
-    public List<Integer> getFilledColumns() {
-        return filledStacks;
-    }
-
 }

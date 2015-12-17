@@ -13,11 +13,12 @@ public class UiText {
     public static final String RESIGN = "Resign";
     public static final String HELP = "Help";
     public static final String ABOUT = "About";
-    public static final String YOUR_TURN = "It's your turn, player ";
+    public static final String YOUR_TURN = "It is ";
+    public static final String YOUR_TURN_END = " player's turn.";
     public static final String RED = "Red";
     public static final String BLACK = "Black";
     public class Errors {
-        public static final String ERROR_OCCURED = "Error";
+        public static final String ERROR = "Error";
         public static final String LOAD_RESOURCES_FAILED = "Could not load game resources. Exiting.";
         public static final String CONNECTION_TO_SERVER_FAILED = "Could not connect to remote game server. Exiting.";
         public static final String CONNECTION_TO_SERVER_LOST = "Lost connection to server. Exiting";

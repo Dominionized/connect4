@@ -24,7 +24,6 @@ public class MyImageContainer extends JLabel
 	{
 		if(icon != null)
 		{
-			//TODO ideally, we should strech the image evenly in both directions...
 			this.icon = icon;
 			Image image = icon.getImage(); 
 			Image newimg = image.getScaledInstance(this.getCustomWidth(), this.getCustomHeight(),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  

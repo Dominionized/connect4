@@ -33,8 +33,9 @@ public class ServerController extends Server implements Connect4Server {
 
     public static final long DEFAULT_POLL_INTERVAL_MS = 500;
 
-    private IServerListener serverListener;
     private CallHandler handler;
+    private IServerListener serverListener;
+
     private GameConfig config;
     private Game game;
 
@@ -56,7 +57,6 @@ public class ServerController extends Server implements Connect4Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ServerController extends Server implements Connect4Server {
         }
     }
 
-    // Notify all observers of winner.
+    @Override
     public void resign() {
         game.resign();
     }
@@ -85,26 +85,7 @@ public class ServerController extends Server implements Connect4Server {
 
     @Override
     public void unregisterObserver(int id) {
-        try {
-            this.game.unregisterObserver(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.game.unregisterObserver(id);
     }
 
-    // Split this method.
-    // Have the client reset his UI.
-    // Have the server reset the model.
-    private void restartGame() {
-        this.game = new Game(this.config);
-//        game = new Game(this.config.getColumns(), this.config.getColumns());
-//        game.registerObserver(this);
-//        game.setTokenCountWin(nbCellsToWin);
-//        view.initBoard(game.getSizeY(), game.getSizeX());
-//        view.changeControlButtonsEnableState();
-    }
-
-    public Game getGame() {
-        return game;
-    }
 }
